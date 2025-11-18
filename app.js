@@ -11,8 +11,24 @@ const progressRoutes = require('./routes/progress');
 
 const app = express();
 
+const allowedOrigins = [
+  'https://cam-frontend.vercel.app', // Reemplaza con tu URL de Vercel
+  'http://localhost:4200'
+];
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: function (origin, callback) {
+    // Permitir requests sin origin (como mobile apps o curl requests)
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.indexOf(origin) === -1) {
+      const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
+      return callback(new Error(msg), false);
+    }
+    return callback(null, true);
+  },
+  credentials: true
+}));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 
