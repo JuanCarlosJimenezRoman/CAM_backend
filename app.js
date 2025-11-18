@@ -82,3 +82,23 @@ app.listen(PORT, async () => {
     }
   }
 });
+
+// Inicializar BD al inicio
+const initializeApp = async () => {
+  try {
+    console.log('🏗️ Inicializando aplicación...');
+    
+    if (process.env.DATABASE_URL) {
+      console.log('📡 Conectando a base de datos...');
+      await initDatabase();
+      console.log('✅ Base de datos lista');
+    } else {
+      console.log('⚠️ DATABASE_URL no encontrada - la BD se inicializará con el primer uso');
+    }
+  } catch (error) {
+    console.error('❌ Error inicializando aplicación:', error.message);
+  }
+};
+
+// Llamar a la inicialización
+initializeApp();
