@@ -1,8 +1,11 @@
 {
   "build": {
-    "builder": "nixpacks"
+    "builder": "nixpacks",
+    "buildCommand": "npm install"
   },
   "deploy": {
-    "startCommand": "npm start"
+    "startCommand": "./start.sh",
+    "healthcheckPath": "/api",
+    "healthcheckTimeout": 300
   }
 }
