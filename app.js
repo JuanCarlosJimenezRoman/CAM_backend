@@ -12,8 +12,9 @@ const progressRoutes = require('./routes/progress');
 const app = express();
 
 const allowedOrigins = [
-  'https://cam-frontend.vercel.app', // Reemplaza con tu URL de Vercel
-  'http://localhost:4200'
+  'https://cam-frontend.vercel.app', // ← REEMPLAZA CON TU URL DE VERCEL
+  'http://localhost:4200',
+  'http://localhost:3000'
 ];
 // Middleware
 app.use(cors({
@@ -29,6 +30,8 @@ app.use(cors({
   },
   credentials: true
 }));
+
+
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 
@@ -59,8 +62,23 @@ app.use((error, req, res, next) => {
   res.status(500).json({ error: 'Error interno del servidor' });
 });
 
+
+const initDatabase = require('./scripts/initDB');
+
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
+
+app.listen(PORT, async () => {
   console.log(`🚀 Servidor corriendo en puerto ${PORT}`);
   console.log(`📊 Entorno: ${process.env.NODE_ENV || 'development'}`);
+  
+  // Inicializar BD automáticamente en producción
+  if (process.env.NODE_ENV === 'production') {
+    console.log('🏗️ Inicializando base de datos en producción...');
+    try {
+      await initDatabase();
+      console.log('✅ Base de datos lista');
+    } catch (error) {
+      console.error('❌ Error inicializando BD:', error.message);
+    }
+  }
 });
