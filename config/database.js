@@ -1,21 +1,29 @@
 const { Pool } = require('pg');
 require('dotenv').config();
 
+// Render inyecta DATABASE_URL automáticamente
+const connectionString = process.env.DATABASE_URL;
+
+if (!connectionString) {
+  console.error('❌ DATABASE_URL no encontrada en variables de entorno');
+  console.log('Variables disponibles:', Object.keys(process.env));
+}
+
 const pool = new Pool({
-  user: process.env.DB_USER || 'postgres',
-  host: process.env.DB_HOST || 'localhost',
-  database: process.env.DB_NAME || 'postgres',
-  password: process.env.DB_PASSWORD || 'password',
-  port: process.env.DB_PORT || 5432,
+  connectionString: connectionString,
+  // SSL es requerido en Render
+  ssl: process.env.NODE_ENV === 'production' ? { 
+    rejectUnauthorized: false 
+  } : false
 });
 
-// Verificar conexión a la base de datos
+// Verificar conexión
 pool.on('connect', () => {
-  console.log('Conectado a la base de datos PostgreSQL');
+  console.log('✅ Conectado a PostgreSQL en Render');
 });
 
 pool.on('error', (err) => {
-  console.error('Error en la conexión a la base de datos:', err);
+  console.error('❌ Error en conexión a PostgreSQL:', err);
 });
 
 module.exports = {
